@@ -24,9 +24,6 @@ import java.io.IOException;
 
 import io.appium.uiautomator2.common.exceptions.SessionRemovedException;
 import io.appium.uiautomator2.model.By;
-import io.appium.uiautomator2.server.ServerConfig;
-import io.appium.uiautomator2.server.ServerInstrumentation;
-import io.appium.uiautomator2.server.WDStatus;
 import io.appium.uiautomator2.utils.Device;
 import io.appium.uiautomator2.utils.Logger;
 
