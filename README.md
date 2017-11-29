@@ -1,6 +1,6 @@
 
 [![Build Status](https://team-appium.ci.cloudbees.com/view/All/job/appium-uiautomator2-server-e2e/badge/icon)](https://team-appium.ci.cloudbees.com/view/All/job/appium-uiautomator2-server-e2e/)
-### appium-uiautmator2-server
+### appium-uiautomator2-server
 
 A netty server that runs on the device listening for commands and executes using UiAutomator V2.
 
@@ -35,3 +35,8 @@ you can also invoke the test using below command
 `adb shell am instrument -w io.appium.uiautomator2.e2etest.test/android.support.test.runner.AndroidJUnitRunner`
 
 Note: AUT apk should be installed before executing above command.
+
+
+### Other Sections:
+* [WIKI](https://github.com/appium/appium-uiautomator2-server/wiki)
+* [Version Release](https://github.com/appium/appium-uiautomator2-server/blob/master/doc/release.md)
