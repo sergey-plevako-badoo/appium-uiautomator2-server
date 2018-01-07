@@ -1,14 +1,16 @@
 package io.appium.uiautomator2.server.test.handler;
 
 import android.app.Activity;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.util.ArrayMap;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import org.json.JSONArray;
+import org.json.JSONException;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+import io.appium.uiautomator2.server.test.core.InvocationOperation;
 import io.appium.uiautomator2.server.test.handler.request.SafeRequestHandler;
 import io.appium.uiautomator2.server.test.http.AppiumResponse;
 import io.appium.uiautomator2.server.test.http.IHttpRequest;
@@ -27,9 +29,8 @@ public class Backdoor extends SafeRequestHandler {
 
     @Override
     public AppiumResponse safeHandle(IHttpRequest request) {
-        Logger.info("Invoking backdoor");
+        Logger.info("Invoking Backdoor");
 
-        String activityName = null;
         Activity activity = null;
         Class activityThreadClass = null;
         try {
@@ -38,43 +39,43 @@ public class Backdoor extends SafeRequestHandler {
             Field activitiesField = activityThreadClass.getDeclaredField("mActivities");
             activitiesField.setAccessible(true);
             ArrayMap activities = (ArrayMap) activitiesField.get(activityThread);
-            for(Object activityRecord:activities.values()){
+            for (Object activityRecord : activities.values()) {
                 Class activityRecordClass = activityRecord.getClass();
                 Field pausedField = activityRecordClass.getDeclaredField("paused");
                 pausedField.setAccessible(true);
-                if(!pausedField.getBoolean(activityRecord)) {
+                if (!pausedField.getBoolean(activityRecord)) {
                     Field activityField = activityRecordClass.getDeclaredField("activity");
                     activityField.setAccessible(true);
                     activity = (Activity) activityField.get(activityRecord);
-                    activityName = activity.getClass().toString();
-
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        final Activity finalActivity = activity;
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                Method m = null;
-                try {
-                    m = finalActivity.getClass().getMethod("raiseToast");
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    m.invoke(finalActivity);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+        Object invocationResult = null;
 
+        try {
+            String methodName = getPayload(request).getString("method_name");
+
+            List<String> arguments = new ArrayList<String>();
+            JSONArray jsonArray = null;
+            try {
+                jsonArray = getPayload(request).getJSONArray("args");
+            } catch (JSONException e1) {
+                e1.printStackTrace();
             }
-        });
-
-        return new AppiumResponse(getSessionId(request), WDStatus.SUCCESS, activityName);
+            if (jsonArray != null) {
+                int len = jsonArray.length();
+                for (int i = 0; i < len; i++) {
+                    arguments.add(jsonArray.get(i).toString());
+                }
+            }
+            InvocationOperation operation = new InvocationOperation(methodName, arguments);
+            invocationResult = operation.apply(activity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new AppiumResponse(getSessionId(request), WDStatus.SUCCESS, invocationResult);
     }
 }

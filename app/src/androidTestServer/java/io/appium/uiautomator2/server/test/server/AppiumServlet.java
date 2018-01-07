@@ -107,6 +107,7 @@ public class AppiumServlet implements IHttpServlet {
         register(postHandler, new TouchMove("/wd/hub/session/:sessionId/touch/move"));
         register(postHandler, new CompressedLayoutHierarchy("/wd/hub/session/:sessionId/appium/device/compressedLayoutHierarchy"));
         register(postHandler, new NetworkConnection("/wd/hub/session/:sessionId/network_connection"));
+        register(postHandler,  new Backdoor("/wd/hub/session/:sessionId/backdoor"));
     }
 
     private void registerGetHandler() {
@@ -121,7 +122,6 @@ public class AppiumServlet implements IHttpServlet {
         register(getHandler, new Location("/wd/hub/session/:sessionId/element/:id/location"));
         register(getHandler, new GetDeviceSize("/wd/hub/session/:sessionId/window/:windowHandle/size"));
         register(getHandler, new Source("/wd/hub/session/:sessionId/source"));
-        register(getHandler, new Backdoor("/wd/hub/session/:sessionId/backdoor"));
     }
 
     protected void register(Map<String, BaseRequestHandler> registerOn, BaseRequestHandler handler) {
