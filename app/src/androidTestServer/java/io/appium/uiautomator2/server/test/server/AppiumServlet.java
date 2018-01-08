@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import io.appium.uiautomator2.server.test.handler.AppStrings;
+import io.appium.uiautomator2.server.test.handler.Backdoor;
 import io.appium.uiautomator2.server.test.handler.CaptureScreenshot;
 import io.appium.uiautomator2.server.test.handler.Clear;
 import io.appium.uiautomator2.server.test.handler.Click;
@@ -109,6 +110,7 @@ public class AppiumServlet implements IHttpServlet {
         register(postHandler, new TouchMove("/wd/hub/session/:sessionId/touch/move"));
         register(postHandler, new UpdateSettings("/wd/hub/session/:sessionId/appium/settings"));
         register(postHandler, new NetworkConnection("/wd/hub/session/:sessionId/network_connection"));
+        register(postHandler, new Backdoor("/wd/hub/session/:sessionId/backdoor"));
     }
 
     private void registerGetHandler() {
@@ -125,6 +127,7 @@ public class AppiumServlet implements IHttpServlet {
         register(getHandler, new Location("/wd/hub/session/:sessionId/element/:id/location"));
         register(getHandler, new GetDeviceSize("/wd/hub/session/:sessionId/window/:windowHandle/size"));
         register(getHandler, new Source("/wd/hub/session/:sessionId/source"));
+        register(postHandler, new Backdoor("/wd/hub/session/:sessionId/back"));
     }
 
     protected void register(Map<String, BaseRequestHandler> registerOn, BaseRequestHandler handler) {
