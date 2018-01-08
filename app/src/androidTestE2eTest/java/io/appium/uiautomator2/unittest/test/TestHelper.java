@@ -18,6 +18,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
+import io.appium.uiautomator2.server.ServerConfig;
 import io.appium.uiautomator2.utils.Device;
 import io.appium.uiautomator2.utils.Logger;
 
