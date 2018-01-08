@@ -8,8 +8,8 @@ import io.appium.uiautomator2.server.test.http.AppiumResponse;
 import io.appium.uiautomator2.server.test.http.IHttpRequest;
 import io.appium.uiautomator2.server.test.model.OrientationEnum;
 import io.appium.uiautomator2.server.test.server.WDStatus;
-import io.appium.uiautomator2.server.test.utils.Logger;
 import io.appium.uiautomator2.server.test.utils.Device;
+import io.appium.uiautomator2.server.test.utils.Logger;
 
 public class GetRotation extends SafeRequestHandler {
 

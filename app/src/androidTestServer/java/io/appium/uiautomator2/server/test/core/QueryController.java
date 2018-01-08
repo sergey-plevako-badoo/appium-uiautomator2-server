@@ -18,8 +18,8 @@ package io.appium.uiautomator2.server.test.core;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import io.appium.uiautomator2.server.test.exceptions.UiAutomator2Exception;
-import io.appium.uiautomator2.server.test.utils.ReflectionUtils;
 
+import static io.appium.uiautomator2.server.test.utils.ReflectionUtils.invoke;
 import static io.appium.uiautomator2.server.test.utils.ReflectionUtils.method;
 
 public class QueryController {
@@ -34,7 +34,7 @@ public class QueryController {
     }
 
     public AccessibilityNodeInfo getAccessibilityRootNode() throws UiAutomator2Exception {
-        return (AccessibilityNodeInfo) ReflectionUtils.invoke(ReflectionUtils.method(CLASS_QUERY_CONTROLLER, METHOD_GET_ACCESSIBILITY_ROOT_NODE), queryController);
+        return (AccessibilityNodeInfo) invoke(method(CLASS_QUERY_CONTROLLER, METHOD_GET_ACCESSIBILITY_ROOT_NODE), queryController);
     }
 
 }

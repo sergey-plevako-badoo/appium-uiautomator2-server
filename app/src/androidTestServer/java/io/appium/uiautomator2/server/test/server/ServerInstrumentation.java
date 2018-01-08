@@ -10,7 +10,6 @@ import io.appium.uiautomator2.server.test.utils.Logger;
 
 import static io.appium.uiautomator2.server.test.utils.Device.getUiDevice;
 
-
 public class ServerInstrumentation {
     private static ServerInstrumentation instance;
     private static Context context;

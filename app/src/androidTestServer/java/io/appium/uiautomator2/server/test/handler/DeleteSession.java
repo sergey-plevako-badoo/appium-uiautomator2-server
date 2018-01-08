@@ -10,7 +10,6 @@ import io.appium.uiautomator2.server.test.server.ServerConfig;
 import io.appium.uiautomator2.server.test.server.ServerInstrumentation;
 import io.appium.uiautomator2.server.test.server.WDStatus;
 import io.appium.uiautomator2.server.test.utils.Logger;
-
 public class DeleteSession extends SafeRequestHandler {
 
     public DeleteSession(String mappedUri) {

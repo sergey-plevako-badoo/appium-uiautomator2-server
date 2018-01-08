@@ -11,11 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import io.appium.uiautomator2.server.test.handler.AppStrings;
-import io.appium.uiautomator2.server.test.handler.Backdoor;
 import io.appium.uiautomator2.server.test.handler.CaptureScreenshot;
 import io.appium.uiautomator2.server.test.handler.Clear;
 import io.appium.uiautomator2.server.test.handler.Click;
-import io.appium.uiautomator2.server.test.handler.CompressedLayoutHierarchy;
 import io.appium.uiautomator2.server.test.handler.DeleteSession;
 import io.appium.uiautomator2.server.test.handler.Drag;
 import io.appium.uiautomator2.server.test.handler.FindElement;
@@ -23,7 +21,9 @@ import io.appium.uiautomator2.server.test.handler.FindElements;
 import io.appium.uiautomator2.server.test.handler.Flick;
 import io.appium.uiautomator2.server.test.handler.GetDeviceSize;
 import io.appium.uiautomator2.server.test.handler.GetElementAttribute;
+import io.appium.uiautomator2.server.test.handler.GetElementScreenshot;
 import io.appium.uiautomator2.server.test.handler.GetName;
+import io.appium.uiautomator2.server.test.handler.GetRect;
 import io.appium.uiautomator2.server.test.handler.GetRotation;
 import io.appium.uiautomator2.server.test.handler.GetScreenOrientation;
 import io.appium.uiautomator2.server.test.handler.GetSize;
@@ -46,12 +46,13 @@ import io.appium.uiautomator2.server.test.handler.TouchDown;
 import io.appium.uiautomator2.server.test.handler.TouchLongClick;
 import io.appium.uiautomator2.server.test.handler.TouchMove;
 import io.appium.uiautomator2.server.test.handler.TouchUp;
+import io.appium.uiautomator2.server.test.handler.W3CActions;
 import io.appium.uiautomator2.server.test.handler.request.BaseRequestHandler;
+import io.appium.uiautomator2.server.test.handler.UpdateSettings;
 import io.appium.uiautomator2.server.test.http.AppiumResponse;
 import io.appium.uiautomator2.server.test.http.IHttpRequest;
 import io.appium.uiautomator2.server.test.http.IHttpResponse;
 import io.appium.uiautomator2.server.test.http.IHttpServlet;
-
 
 public class AppiumServlet implements IHttpServlet {
 
@@ -102,12 +103,12 @@ public class AppiumServlet implements IHttpServlet {
         register(postHandler, new Flick("/wd/hub/session/:sessionId/touch/flick"));
         register(postHandler, new ScrollTo("/wd/hub/session/:sessionId/touch/scroll"));
         register(postHandler, new MultiPointerGesture("/wd/hub/session/:sessionId/touch/multi/perform"));
+        register(postHandler, new W3CActions("/wd/hub/session/:sessionId/actions"));
         register(postHandler, new TouchDown("/wd/hub/session/:sessionId/touch/down"));
         register(postHandler, new TouchUp("/wd/hub/session/:sessionId/touch/up"));
         register(postHandler, new TouchMove("/wd/hub/session/:sessionId/touch/move"));
-        register(postHandler, new CompressedLayoutHierarchy("/wd/hub/session/:sessionId/appium/device/compressedLayoutHierarchy"));
+        register(postHandler, new UpdateSettings("/wd/hub/session/:sessionId/appium/settings"));
         register(postHandler, new NetworkConnection("/wd/hub/session/:sessionId/network_connection"));
-        register(postHandler,  new Backdoor("/wd/hub/session/:sessionId/backdoor"));
     }
 
     private void registerGetHandler() {
@@ -117,8 +118,10 @@ public class AppiumServlet implements IHttpServlet {
         register(getHandler, new GetRotation("/wd/hub/session/:sessionId/rotation"));
         register(getHandler, new GetText("/wd/hub/session/:sessionId/element/:id/text"));
         register(getHandler, new GetElementAttribute("/wd/hub/session/:sessionId/element/:id/attribute/:name"));
+        register(getHandler, new GetRect("/wd/hub/session/:sessionId/element/:id/rect"));
         register(getHandler, new GetSize("/wd/hub/session/:sessionId/element/:id/size"));
         register(getHandler, new GetName("/wd/hub/session/:sessionId/element/:id/name"));
+        register(getHandler, new GetElementScreenshot("/wd/hub/session/:sessionId/element/:id/screenshot"));
         register(getHandler, new Location("/wd/hub/session/:sessionId/element/:id/location"));
         register(getHandler, new GetDeviceSize("/wd/hub/session/:sessionId/window/:windowHandle/size"));
         register(getHandler, new Source("/wd/hub/session/:sessionId/source"));

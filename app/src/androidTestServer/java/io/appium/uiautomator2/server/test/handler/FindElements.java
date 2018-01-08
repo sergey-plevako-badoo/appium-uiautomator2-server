@@ -26,6 +26,7 @@ import io.appium.uiautomator2.server.test.http.AppiumResponse;
 import io.appium.uiautomator2.server.test.http.IHttpRequest;
 import io.appium.uiautomator2.server.test.model.AndroidElement;
 import io.appium.uiautomator2.server.test.model.By;
+import io.appium.uiautomator2.server.test.model.By.ById;
 import io.appium.uiautomator2.server.test.model.KnownElements;
 import io.appium.uiautomator2.server.test.model.XPathFinder;
 import io.appium.uiautomator2.server.test.model.internal.NativeAndroidBySelector;
@@ -36,7 +37,10 @@ import io.appium.uiautomator2.server.test.utils.Logger;
 import io.appium.uiautomator2.server.test.utils.NodeInfoList;
 import io.appium.uiautomator2.server.test.utils.UiAutomatorParser;
 
+import static io.appium.uiautomator2.server.test.handler.FindElement.getElementLocator;
 import static io.appium.uiautomator2.server.test.model.internal.CustomUiDevice.getInstance;
+import static io.appium.uiautomator2.server.test.utils.Device.getAndroidElement;
+import static io.appium.uiautomator2.server.test.utils.Device.getUiDevice;
 
 public class FindElements extends SafeRequestHandler {
 
@@ -83,7 +87,7 @@ public class FindElements extends SafeRequestHandler {
 
             for (Object element : elements) {
                 String id = UUID.randomUUID().toString();
-                AndroidElement androidElement = Device.getAndroidElement(id, element, by);
+                AndroidElement androidElement = getAndroidElement(id, element, by);
                 ke.add(androidElement);
                 JSONObject jsonElement = new JSONObject();
                 jsonElement.put("ELEMENT", id);
@@ -125,7 +129,7 @@ public class FindElements extends SafeRequestHandler {
 
     private List<Object> findElements(By by) throws ElementNotFoundException, ParserConfigurationException, ClassNotFoundException, InvalidSelectorException, UiAutomator2Exception, UiSelectorSyntaxException {
         if (by instanceof By.ById) {
-            String locator = FindElement.getElementLocator((By.ById) by);
+            String locator = getElementLocator((ById) by);
             return getInstance().findObjects(android.support.test.uiautomator.By.res(locator));
         } else if (by instanceof By.ByAccessibilityId) {
             return getInstance().findObjects(android.support.test.uiautomator.By.desc(by.getElementLocator()));
@@ -149,8 +153,8 @@ public class FindElements extends SafeRequestHandler {
         if (element == null) {
             throw new ElementNotFoundException();
         }
-        if (by instanceof By.ById) {
-            String locator = FindElement.getElementLocator((By.ById)by);
+        if (by instanceof ById) {
+            String locator = getElementLocator((ById)by);
             return element.getChildren(android.support.test.uiautomator.By.res(locator), by);
         } else if (by instanceof By.ByAccessibilityId) {
             return element.getChildren(android.support.test.uiautomator.By.desc(by.getElementLocator()), by);
@@ -229,7 +233,7 @@ public class FindElements extends SafeRequestHandler {
         if (endsWithInstance) {
             Logger.debug("Selector ends with instance.");
             // There's exactly one element when using instance.
-            UiObject instanceObj = Device.getUiDevice().findObject(sel);
+            UiObject instanceObj = getUiDevice().findObject(sel);
             if (instanceObj != null && instanceObj.exists()) {
                 elements.add(instanceObj);
             }

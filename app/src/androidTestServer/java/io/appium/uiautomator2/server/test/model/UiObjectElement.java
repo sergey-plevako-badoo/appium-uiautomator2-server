@@ -13,19 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import io.appium.uiautomator2.server.test.core.AccessibilityNodeInfoGetter;
 import io.appium.uiautomator2.server.test.exceptions.InvalidCoordinatesException;
 import io.appium.uiautomator2.server.test.exceptions.InvalidSelectorException;
 import io.appium.uiautomator2.server.test.exceptions.NoAttributeFoundException;
-import io.appium.uiautomator2.server.test.core.AccessibilityNodeInfoGetter;
+import io.appium.uiautomator2.server.test.model.AndroidElement;
 import io.appium.uiautomator2.server.test.model.internal.CustomUiDevice;
 import io.appium.uiautomator2.server.test.utils.API;
 import io.appium.uiautomator2.server.test.utils.Device;
+import io.appium.uiautomator2.server.test.utils.ElementHelpers;
 import io.appium.uiautomator2.server.test.utils.Logger;
 import io.appium.uiautomator2.server.test.utils.Point;
 import io.appium.uiautomator2.server.test.utils.PositionHelper;
-import io.appium.uiautomator2.server.test.utils.ReflectionUtils;
-import io.appium.uiautomator2.server.test.utils.UnicodeEncoder;
 
+import static io.appium.uiautomator2.server.test.utils.ReflectionUtils.invoke;
 import static io.appium.uiautomator2.server.test.utils.ReflectionUtils.method;
 
 public class UiObjectElement implements AndroidElement {
@@ -103,22 +104,16 @@ public class UiObjectElement implements AndroidElement {
             res = element.isSelected();
         } else if ("displayed".equals(attr)) {
             res = element.exists();
-        } else {
+        } else if ("password".equals(attr)) {
+            res = AccessibilityNodeInfoGetter.fromUiObject(element).isPassword();
+        }  else {
             throw new NoAttributeFoundException(attr);
         }
         return res;
     }
 
     public void setText(final String text, boolean unicodeKeyboard) throws UiObjectNotFoundException {
-        if (unicodeKeyboard && UnicodeEncoder.needsEncoding(text)) {
-            Logger.debug("Sending Unicode text to element: " + text);
-            String encodedText = UnicodeEncoder.encode(text);
-            Logger.debug("Encoded text: " + encodedText);
-            element.setText(encodedText);
-        } else {
-            Logger.debug("Sending plain text to element: " + text);
-            element.setText(text);
-        }
+        ElementHelpers.setText(element, text, unicodeKeyboard);
     }
 
     public By getBy() {
@@ -126,7 +121,7 @@ public class UiObjectElement implements AndroidElement {
     }
 
     public void clear() throws UiObjectNotFoundException {
-        element.clearTextField();
+        element.setText("");
     }
 
     public String getId() {
@@ -258,7 +253,7 @@ public class UiObjectElement implements AndroidElement {
        * The returned string matches exactly what is displayed in the
        * UiAutomater inspector.
        */
-            AccessibilityNodeInfo node = (AccessibilityNodeInfo) ReflectionUtils.invoke(ReflectionUtils.method(element.getClass(), "findAccessibilityNodeInfo", long.class),
+            AccessibilityNodeInfo node = (AccessibilityNodeInfo) invoke(method(element.getClass(), "findAccessibilityNodeInfo", long.class),
                     element, Configurator.getInstance().getWaitForSelectorTimeout());
 
             if (node == null) {

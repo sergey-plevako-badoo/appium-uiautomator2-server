@@ -25,18 +25,21 @@ import io.appium.uiautomator2.server.test.http.AppiumResponse;
 import io.appium.uiautomator2.server.test.http.IHttpRequest;
 import io.appium.uiautomator2.server.test.model.AndroidElement;
 import io.appium.uiautomator2.server.test.model.By;
+import io.appium.uiautomator2.server.test.model.By.ByClass;
+import io.appium.uiautomator2.server.test.model.By.ById;
 import io.appium.uiautomator2.server.test.model.KnownElements;
 import io.appium.uiautomator2.server.test.model.Session;
 import io.appium.uiautomator2.server.test.model.XPathFinder;
 import io.appium.uiautomator2.server.test.model.internal.NativeAndroidBySelector;
 import io.appium.uiautomator2.server.test.server.WDStatus;
-import io.appium.uiautomator2.server.test.utils.NodeInfoList;
 import io.appium.uiautomator2.server.test.utils.Device;
 import io.appium.uiautomator2.server.test.utils.Logger;
+import io.appium.uiautomator2.server.test.utils.NodeInfoList;
 import io.appium.uiautomator2.server.test.utils.UiAutomatorParser;
 
 import static io.appium.uiautomator2.server.test.model.internal.CustomUiDevice.getInstance;
 import static io.appium.uiautomator2.server.test.utils.Device.getAndroidElement;
+import static io.appium.uiautomator2.server.test.utils.Device.getUiDevice;
 
 public class FindElement extends SafeRequestHandler {
 
@@ -139,12 +142,12 @@ public class FindElement extends SafeRequestHandler {
     }
 
     private Object findElement(By by) throws InvalidSelectorException, ElementNotFoundException, ParserConfigurationException, ClassNotFoundException, UiSelectorSyntaxException, UiAutomator2Exception {
-        if (by instanceof By.ById) {
-            String locator = getElementLocator((By.ById)by);
+        if (by instanceof ById) {
+            String locator = getElementLocator((ById)by);
             return getInstance().findObject(android.support.test.uiautomator.By.res(locator));
         } else if (by instanceof By.ByAccessibilityId) {
             return getInstance().findObject(android.support.test.uiautomator.By.desc(by.getElementLocator()));
-        } else if (by instanceof By.ByClass) {
+        } else if (by instanceof ByClass) {
             return getInstance().findObject(android.support.test.uiautomator.By.clazz(by.getElementLocator()));
         } else if (by instanceof By.ByXPath) {
             return getXPathUiObject(by.getElementLocator(), null /* AndroidElement */);
@@ -161,12 +164,12 @@ public class FindElement extends SafeRequestHandler {
         if (element == null) {
             throw new ElementNotFoundException();
         }
-        if (by instanceof By.ById) {
-            String locator = getElementLocator((By.ById)by);
+        if (by instanceof ById) {
+            String locator = getElementLocator((ById)by);
             return element.getChild(android.support.test.uiautomator.By.res(locator));
         } else if (by instanceof By.ByAccessibilityId) {
             return element.getChild(android.support.test.uiautomator.By.desc(by.getElementLocator()));
-        } else if (by instanceof By.ByClass) {
+        } else if (by instanceof ByClass) {
             return element.getChild(android.support.test.uiautomator.By.clazz(by.getElementLocator()));
         } else if (by instanceof By.ByXPath) {
             return getXPathUiObject(by.getElementLocator(), element);
@@ -197,7 +200,7 @@ public class FindElement extends SafeRequestHandler {
         return selectors.get(0);
     }
 
-    public static String getElementLocator(By.ById by){
+    public static String getElementLocator(ById by){
         String locator = by.getElementLocator();
 
         if(!resourceIdRegex.matcher(by.getElementLocator()).matches()) {

@@ -18,6 +18,7 @@ import io.appium.uiautomator2.server.test.exceptions.NoAttributeFoundException;
 import io.appium.uiautomator2.server.test.exceptions.UiAutomator2Exception;
 import io.appium.uiautomator2.server.test.core.AccessibilityNodeInfoGetter;
 import io.appium.uiautomator2.server.test.model.internal.CustomUiDevice;
+import io.appium.uiautomator2.server.test.utils.ElementHelpers;
 import io.appium.uiautomator2.server.test.utils.Logger;
 import io.appium.uiautomator2.server.test.utils.Point;
 import io.appium.uiautomator2.server.test.utils.PositionHelper;
@@ -56,8 +57,14 @@ public class UiObject2Element implements AndroidElement {
          * not formed with valid AccessibilityNodeInfo, Instead we are using custom created AccessibilityNodeInfo of
          * TOAST Element to retrieve the Text.
          */
-        if(isToastElement(nodeInfo)) {
-           return nodeInfo.getText().toString();
+        if (isToastElement(nodeInfo)) {
+            return nodeInfo.getText().toString();
+        }
+
+        if (nodeInfo.getRangeInfo() != null) {
+            /* Refresh accessibility node info to get actual state of element */
+            nodeInfo = AccessibilityNodeInfoGetter.fromUiObject(element);
+            return Float.toString(nodeInfo.getRangeInfo().getCurrent());
         }
         // on null returning empty string
         return element.getText() != null ? element.getText() : "";
@@ -112,22 +119,16 @@ public class UiObject2Element implements AndroidElement {
             res = element.isSelected();
         } else if ("displayed".equals(attr)) {
             res = invoke(method(UiObject2.class, "getAccessibilityNodeInfo"), element) != null ? true : false;
-        } else {
+        }  else if ("password".equals(attr)) {
+            res = AccessibilityNodeInfoGetter.fromUiObject(element).isPassword();
+        }  else {
             throw new NoAttributeFoundException(attr);
         }
         return res;
     }
 
     public void setText(final String text, boolean unicodeKeyboard) throws UiObjectNotFoundException {
-        if (unicodeKeyboard && UnicodeEncoder.needsEncoding(text)) {
-            Logger.debug("Sending Unicode text to element: " + text);
-            String encodedText = UnicodeEncoder.encode(text);
-            Logger.debug("Encoded text: " + encodedText);
-            element.setText(encodedText);
-        } else {
-            Logger.debug("Sending plain text to element: " + text);
-            element.setText(text);
-        }
+        ElementHelpers.setText(element, text, unicodeKeyboard);
     }
 
     public By getBy() {

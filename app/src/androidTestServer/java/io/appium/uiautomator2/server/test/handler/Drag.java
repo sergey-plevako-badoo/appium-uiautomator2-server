@@ -12,10 +12,11 @@ import io.appium.uiautomator2.server.test.http.IHttpRequest;
 import io.appium.uiautomator2.server.test.model.AndroidElement;
 import io.appium.uiautomator2.server.test.model.KnownElements;
 import io.appium.uiautomator2.server.test.server.WDStatus;
-import io.appium.uiautomator2.server.test.utils.Device;
 import io.appium.uiautomator2.server.test.utils.Logger;
 import io.appium.uiautomator2.server.test.utils.Point;
 import io.appium.uiautomator2.server.test.utils.PositionHelper;
+
+import static io.appium.uiautomator2.server.test.utils.Device.getUiDevice;
 
 public class Drag extends SafeRequestHandler {
     public Drag(String mappedUri) {
@@ -57,7 +58,7 @@ public class Drag extends SafeRequestHandler {
 
         Logger.debug("Dragging from " + absStartPos.toString() + " to "
                 + absEndPos.toString() + " with steps: " + dragArgs.steps.toString());
-        final boolean res = Device.getUiDevice().drag(absStartPos.x.intValue(),
+        final boolean res = getUiDevice().drag(absStartPos.x.intValue(),
                 absStartPos.y.intValue(), absEndPos.x.intValue(),
                 absEndPos.y.intValue(), dragArgs.steps);
         if (!res) {

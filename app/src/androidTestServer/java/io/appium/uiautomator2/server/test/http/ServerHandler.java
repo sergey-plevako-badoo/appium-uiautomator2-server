@@ -18,9 +18,9 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     private final static java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ServerHandler.class.getName());
-    private List<IHttpServlet> httpHandlers;
+    private List<io.appium.uiautomator2.server.test.http.IHttpServlet> httpHandlers;
 
-    public ServerHandler(List<IHttpServlet> handlers) {
+    public ServerHandler(List<io.appium.uiautomator2.server.test.http.IHttpServlet> handlers) {
         this.httpHandlers = handlers;
     }
 
@@ -37,10 +37,10 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
         Logger.info("channel read: " + request.getMethod().toString() + " " + request.getUri());
 
-        IHttpRequest httpRequest = new NettyHttpRequest(request);
-        IHttpResponse httpResponse = new NettyHttpResponse(response);
+        io.appium.uiautomator2.server.test.http.IHttpRequest httpRequest = new NettyHttpRequest(request);
+        io.appium.uiautomator2.server.test.http.IHttpResponse httpResponse = new NettyHttpResponse(response);
 
-        for (IHttpServlet handler : httpHandlers) {
+        for (io.appium.uiautomator2.server.test.http.IHttpServlet handler : httpHandlers) {
             handler.handleHttpRequest(httpRequest, httpResponse);
             if (httpResponse.isClosed()) {
                 break;
