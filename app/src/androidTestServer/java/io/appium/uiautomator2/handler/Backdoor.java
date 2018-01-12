@@ -1,6 +1,9 @@
 package io.appium.uiautomator2.handler;
 
 import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.util.ArrayMap;
 
 import org.json.JSONArray;
@@ -9,6 +12,7 @@ import org.json.JSONException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.appium.uiautomator2.core.InvocationOperation;
 import io.appium.uiautomator2.handler.request.SafeRequestHandler;
@@ -71,8 +75,17 @@ public class Backdoor extends SafeRequestHandler {
                     arguments.add(jsonArray.get(i).toString());
                 }
             }
+
+            Application application = activity.getApplication();
             InvocationOperation operation = new InvocationOperation(methodName, arguments);
-            invocationResult = operation.apply(activity);
+
+            invocationResult = operation.apply(application);
+
+            if (invocationResult instanceof Map && ((Map) invocationResult).containsKey("error")) {
+                invocationResult = operation.apply(activity);
+            }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
