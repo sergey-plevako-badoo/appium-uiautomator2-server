@@ -1,6 +1,7 @@
 package io.appium.uiautomator2.core;
 
 import android.support.test.InstrumentationRegistry;
+import android.util.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,6 +23,8 @@ public class InvocationOperation  {
 
 
     public Object apply(final Object o) throws Exception {
+        Log.d("Backdoor Method", getName());
+        Log.d("Invoking on ", o.toString());
         final AtomicReference<Object> ref = new AtomicReference<Object>();
         final AtomicReference<Exception> refEx = new AtomicReference<Exception>();
 

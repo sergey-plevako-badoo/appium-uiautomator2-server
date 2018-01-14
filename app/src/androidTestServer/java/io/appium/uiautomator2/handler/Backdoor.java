@@ -1,9 +1,8 @@
 package io.appium.uiautomator2.handler;
 
 import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.ArrayMap;
 
 import org.json.JSONArray;
@@ -34,7 +33,67 @@ public class Backdoor extends SafeRequestHandler {
     @Override
     public AppiumResponse safeHandle(IHttpRequest request) {
         Logger.info("Invoking Backdoor");
+        Activity activity = getActivity();
 
+        List<InvocationOperation> ops = getBackdoorOperations(request);
+
+        Object invocationResult = null;
+
+        Object InvokeOn = activity.getApplication();
+        for (InvocationOperation op : ops) {
+            try {
+                invocationResult = op.apply(InvokeOn);
+                InvokeOn = invocationResult;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (invocationResult instanceof Map && ((Map) invocationResult).containsKey("error")) {
+            InvokeOn = activity;
+            for (InvocationOperation op : ops) {
+                try {
+                    invocationResult = op.apply(InvokeOn);
+                    InvokeOn = invocationResult;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return new AppiumResponse(getSessionId(request), WDStatus.SUCCESS, invocationResult);
+    }
+
+    @NonNull
+    private List<InvocationOperation> getBackdoorOperations(IHttpRequest request) {
+        List<InvocationOperation> ops = new ArrayList<>();
+        try {
+            JSONArray methods = getPayload(request).getJSONArray("methods");
+            for (int i = 0; i < methods.length(); i++) {
+                String methodName = methods.getJSONObject(i).getString("name");
+
+                List<String> arguments = new ArrayList<String>();
+                JSONArray jsonArray = null;
+                try {
+                    jsonArray = methods.getJSONObject(i).getJSONArray("args");
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                if (jsonArray != null) {
+                    for (int j = 0; j < jsonArray.length(); j++) {
+                        arguments.add(jsonArray.get(j).toString());
+                    }
+                }
+                ops.add(new InvocationOperation(methodName,arguments));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return ops;
+    }
+
+    @Nullable
+    private Activity getActivity() {
         Activity activity = null;
         Class activityThreadClass = null;
         try {
@@ -56,39 +115,6 @@ public class Backdoor extends SafeRequestHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        Object invocationResult = null;
-
-        try {
-            String methodName = getPayload(request).getString("method_name");
-
-            List<String> arguments = new ArrayList<String>();
-            JSONArray jsonArray = null;
-            try {
-                jsonArray = getPayload(request).getJSONArray("args");
-            } catch (JSONException e1) {
-                e1.printStackTrace();
-            }
-            if (jsonArray != null) {
-                int len = jsonArray.length();
-                for (int i = 0; i < len; i++) {
-                    arguments.add(jsonArray.get(i).toString());
-                }
-            }
-
-            Application application = activity.getApplication();
-            InvocationOperation operation = new InvocationOperation(methodName, arguments);
-
-            invocationResult = operation.apply(application);
-
-            if (invocationResult instanceof Map && ((Map) invocationResult).containsKey("error")) {
-                invocationResult = operation.apply(activity);
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new AppiumResponse(getSessionId(request), WDStatus.SUCCESS, invocationResult);
+        return activity;
     }
 }
