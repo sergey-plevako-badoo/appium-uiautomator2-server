@@ -18,7 +18,9 @@ import io.appium.uiautomator2.handler.DeleteSession;
 import io.appium.uiautomator2.handler.Drag;
 import io.appium.uiautomator2.handler.FindElement;
 import io.appium.uiautomator2.handler.FindElements;
+import io.appium.uiautomator2.handler.FirstVisibleView;
 import io.appium.uiautomator2.handler.Flick;
+import io.appium.uiautomator2.handler.GetDevicePixelRatio;
 import io.appium.uiautomator2.handler.GetDeviceSize;
 import io.appium.uiautomator2.handler.GetElementAttribute;
 import io.appium.uiautomator2.handler.GetElementScreenshot;
@@ -26,7 +28,9 @@ import io.appium.uiautomator2.handler.GetName;
 import io.appium.uiautomator2.handler.GetRect;
 import io.appium.uiautomator2.handler.GetRotation;
 import io.appium.uiautomator2.handler.GetScreenOrientation;
+import io.appium.uiautomator2.handler.GetSessionDetails;
 import io.appium.uiautomator2.handler.GetSize;
+import io.appium.uiautomator2.handler.GetSystemBars;
 import io.appium.uiautomator2.handler.GetText;
 import io.appium.uiautomator2.handler.Location;
 import io.appium.uiautomator2.handler.LongPressKeyCode;
@@ -38,6 +42,7 @@ import io.appium.uiautomator2.handler.PressBack;
 import io.appium.uiautomator2.handler.PressKeyCode;
 import io.appium.uiautomator2.handler.RotateScreen;
 import io.appium.uiautomator2.handler.ScrollTo;
+import io.appium.uiautomator2.handler.ScrollToElement;
 import io.appium.uiautomator2.handler.SendKeysToElement;
 import io.appium.uiautomator2.handler.Source;
 import io.appium.uiautomator2.handler.Status;
@@ -59,6 +64,7 @@ public class AppiumServlet implements IHttpServlet {
     public static final String SESSION_ID_KEY = "SESSION_ID_KEY";
 
     public static final String ELEMENT_ID_KEY = "id";
+    public static final String ELEMENT_ID_NEXT_KEY = "elementId";
     public static final String COMMAND_NAME_KEY = "COMMAND_KEY";
     public static final String NAME_ID_KEY = "NAME_ID_KEY";
     protected static ConcurrentMap<String, BaseRequestHandler> getHandler = new ConcurrentHashMap<String, BaseRequestHandler>();
@@ -109,10 +115,12 @@ public class AppiumServlet implements IHttpServlet {
         register(postHandler, new TouchMove("/wd/hub/session/:sessionId/touch/move"));
         register(postHandler, new UpdateSettings("/wd/hub/session/:sessionId/appium/settings"));
         register(postHandler, new NetworkConnection("/wd/hub/session/:sessionId/network_connection"));
+        register(postHandler, new ScrollToElement("/wd/hub/session/:sessionId/appium/element/:id/scroll_to/:elementId"));
     }
 
     private void registerGetHandler() {
         register(getHandler, new Status("/wd/hub/status"));
+        register(getHandler, new GetSessionDetails("/wd/hub/session/:sessionId"));
         register(getHandler, new CaptureScreenshot("/wd/hub/session/:sessionId/screenshot"));
         register(getHandler, new GetScreenOrientation("/wd/hub/session/:sessionId/orientation"));
         register(getHandler, new GetRotation("/wd/hub/session/:sessionId/rotation"));
@@ -125,6 +133,9 @@ public class AppiumServlet implements IHttpServlet {
         register(getHandler, new Location("/wd/hub/session/:sessionId/element/:id/location"));
         register(getHandler, new GetDeviceSize("/wd/hub/session/:sessionId/window/:windowHandle/size"));
         register(getHandler, new Source("/wd/hub/session/:sessionId/source"));
+        register(getHandler, new GetSystemBars("/wd/hub/session/:sessionId/appium/device/system_bars"));
+        register(getHandler, new GetDevicePixelRatio("/wd/hub/session/:sessionId/appium/device/pixel_ratio"));
+        register(getHandler, new FirstVisibleView("/wd/hub/session/:sessionId/appium/element/:id/first_visible"));
     }
 
     protected void register(Map<String, BaseRequestHandler> registerOn, BaseRequestHandler handler) {
@@ -246,6 +257,10 @@ public class AppiumServlet implements IHttpServlet {
         String name = getParameter(mappedUri, request.uri(), ":name");
         if (name != null) {
             request.data().put(NAME_ID_KEY, name);
+        }
+        String elementId = getParameter(mappedUri, request.uri(), ":elementId");
+        if (elementId != null) {
+            request.data().put(ELEMENT_ID_NEXT_KEY, elementId);
         }
 
         //request.data().put(DRIVER_KEY, driver);
